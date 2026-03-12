@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
 st.set_page_config(
     page_title="MediCheck AI",
@@ -10,13 +10,12 @@ st.set_page_config(
 
 # ✅ FIX: Use Streamlit secrets for cloud deployment (never hardcode API keys)
 try:
-    GEMINI_API_KEY = st.secrets["AIzaSyAYxo6Tldj-TPe_3OgRKBaQXgStL3MNobY"]
+    GEMINI_API_KEY = st.secrets["GOOGLE_API_KEY"]
 except Exception:
     st.error("⚠️ API key not configured. Please add GOOGLE_API_KEY to Streamlit secrets.")
     st.stop()
 
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 st.markdown("""
 <style>
@@ -151,7 +150,10 @@ Respond in HTML format:
 <b>🚨 Warning Signs:</b><br>2-3 symptoms needing emergency care.<br><br>
 Consider Nigerian context — mention malaria for fever symptoms."""
         try:
-            response = model.generate_content(prompt)
+            response = client.models.generate_content(
+                model="gemini-1.5-flash",
+                contents=prompt
+            )
             st.session_state.messages.append({"role": "assistant", "content": response.text})
         except Exception as e:
             st.session_state.messages.append({"role": "assistant", "content": f"⚠️ Error: {str(e)}"})
