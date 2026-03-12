@@ -8,7 +8,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-GEMINI_API_KEY = "AIzaSyB1cokh2jPvh0Zf9hy7EnogRlpmLBcthFU"
+# ✅ FIX: Use Streamlit secrets for cloud deployment (never hardcode API keys)
+try:
+    GEMINI_API_KEY = st.secrets["AIzaSyAYxo6Tldj-TPe_3OgRKBaQXgStL3MNobY"]
+except Exception:
+    st.error("⚠️ API key not configured. Please add GOOGLE_API_KEY to Streamlit secrets.")
+    st.stop()
+
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
